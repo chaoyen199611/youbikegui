@@ -1,0 +1,30 @@
+{
+  "name": "youbikegui",
+  "version": "1.0.0",
+  "description": "a prototype for youbike co. ltd",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chaoyen199611/youbikegui.git"
+  },
+  "author": "joey huang",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/chaoyen199611/youbikegui/issues"
+  },
+  "homepage": "https://github.com/chaoyen199611/youbikegui#readme",
+  "devDependencies": {
+    "electron": "^23.1.4"
+  },
+  "dependencies": {
+    "jquery": "^3.6.4",
+    "leaflet": "^1.9.3",
+    "mysql": "^2.18.1",
+    "mysql2": "^3.2.0",
+    "ssh2": "^1.11.0"
+  }
+}
