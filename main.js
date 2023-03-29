@@ -9,6 +9,7 @@ const path = require('path')
 const createWindow = () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
+    autoHideMenuBar: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: true,
