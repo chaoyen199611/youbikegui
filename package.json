@@ -28,6 +28,7 @@
     "electron": "^23.1.4"
   },
   "dependencies": {
+    "chart.js": "^4.2.1",
     "electron-squirrel-startup": "^1.0.0",
     "jquery": "^3.6.4",
     "leaflet": "^1.9.3",

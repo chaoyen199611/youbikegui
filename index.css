@@ -110,3 +110,28 @@ body,p {
     width: 28%;
     background-color: black;
 }
+
+.icon-list {
+    font-size: 1rem;
+    color:white;
+    background-color: #4B0082;
+    border-radius: 0% 0% 10px 10px;
+    height: 1.3rem;
+    width: 12%;
+    position: absolute;
+    transition: height 0.5s;
+    -webkit-transition: height 0.5s;
+    text-align: center;
+    overflow: hidden;
+    top:0%;
+    left: 50%;
+    transform: translate(-50%, 0%);
+    z-index: 3;
+    border-style: none solid solid solid;
+    transition: 1s;
+}
+
+.icon-list:hover {
+    height: 2.8rem;
+    width: 25%;
+}

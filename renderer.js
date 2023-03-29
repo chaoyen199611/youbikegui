@@ -348,13 +348,21 @@ new Chart(ctx, {
     data: {
         labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
         datasets: [{
-        label: '# of Votes',
-        data: [12, 19, 3, 5, 2, 3],
-        borderWidth: 1
+            label: '# of Votes',
+            data: [12, 19, 3, 5, 2, 3],
+            color:'#ffffff',
+            borderWidth: 1
         }]
     },
     options: {
         scales: {
+        x: {
+            ticks: {
+                font: {
+                    size:6
+                }
+            }
+        },
         y: {
             beginAtZero: true
         }
@@ -362,21 +370,55 @@ new Chart(ctx, {
     }
 });
 
+var timeFormat='%HH:%MM';
+
 new Chart(ctx1, {
     type: 'line',
     data: {
-        labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
         datasets: [{
-        label: '# of Votes',
-        data: [12, 19, 3, 5, 2, 3],
-        borderWidth: 1
+            label: '氣溫',
+            data: [],
+            borderWidth: 1
         }]
     },
     options: {
+        maintainAspectRatio:false,
+        responsive:true,
+        plugins:{
+            legend:{
+                labels:{
+                    boxWidth:20,
+                    color:"#ffffff",
+                    font:{
+                        size:6
+                    }
+                }
+            }
+        },
         scales: {
-        y: {
-            beginAtZero: true
-        }
+            x: {
+                type:'time',
+                time:{
+                    tooltipFormat:timeFormat
+                },
+
+                ticks:{
+                    color:"#ffffff",
+                    font:{
+                        size:6
+                    }
+                }
+            },
+            y: {
+                min:10,
+                max:30,
+                ticks:{
+                    color:"#ffffff",
+                    font:{
+                        size:6
+                    }
+                }
+            }
         }
     }
 });
