@@ -5,10 +5,11 @@
     <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self';
     style-src-elem 'self' https://unpkg.com/leaflet@1.9.3/dist/leaflet.css;
-    script-src-elem 'self' https://unpkg.com/leaflet@1.9.3/dist/leaflet.js;
-    img-src 'self' https://unpkg.com https://tile.openstreetmap.org;
-    connect-src 'self' ;
-    script-src 'self';">
+    script-src-elem 'self' https://unpkg.com/leaflet@1.9.3/dist/leaflet.js https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js 
+    https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js https://cdn.jsdelivr.net/npm/chart.js;
+    img-src 'self' https://unpkg.com https://tile.openstreetmap.org data:;
+    connect-src 'self' data:;
+    script-src 'self' 'unsafe-eval' ;">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
     integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI="
     crossorigin=""/>
@@ -20,11 +21,9 @@
     <title>Youbike2.0 KTown</title>
   </head>
   <body>
-    <h1>Prototype</h1>
-    We are using Node.js <span id="node-version"></span>,
-    Chromium <span id="chrome-version"></span>,
-    and Electron <span id="electron-version"></span>.
+    
     <div class="container">
+      <div id="ct7"></div>
       <div id="map"></div>
       <div id="mydiv">
         <div id="stationname"></div>
@@ -32,10 +31,46 @@
         <div id="bike"></div>
         <div id="free"></div>
       </div>
+      
     </div>
-    
-  
-    
+    <div class="bottom-container">
+      <div class="unbalance">
+        <div id="unbalance-list"></div>
+        <div class="total">營運：<span id="goodcount"></span> 維護：<span id="sleepingcount"></span> 不平衡：<span id="unbalancecount"></span></div>
+      </div>
+      <div class="weather">
+        <div class="weatherinfo">
+          <div id="weathertype">天氣：<span id="wtype"></span> </div>
+          <div id="temptitle">氣溫：<span id="temp"></span> </div>
+          <div id="humidtitle">濕度：<span id="humidity"></span> </div>
+          <div id="tempmintitle">最低溫：<span id="tempmin"></span> </div>
+          <div id="tempmaxtitle">最高溫：<span id="tempmax"></span> </div>
+          <div id="pressuretitle">氣壓：<span id="pressure"></span> </div>
+          <div id="windtitile">風速：<span id="wind"></span> </div>
+          <div id="cloudtitle">雲量：<span id="cloud"></span> </div>
+          <div id="raintitle">雨量：<span id="rain"></span> </div>
+        </div>
+        <div class="chart-container">
+          <div class="chart">
+            <canvas id="myChart"></canvas>
+          </div>
+          <div class="chart">
+            <canvas id="myChart1"></canvas>
+          </div>
+        </div>
+        
+        
+      </div>
+      <div class="dummy1">
+
+      </div>
+      <div class="dummy2">
+        
+      </div>  
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
     <script src="renderer.js"></script>
   </body>
 </html>
