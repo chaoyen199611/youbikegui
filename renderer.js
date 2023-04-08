@@ -139,6 +139,9 @@ const forwardConfig = {
     dstHost: dbServer.host,
     dstPort: dbServer.port
 };
+
+// create a ssh connection to server
+
 const SSHConnection = new Promise((resolve, reject) => {
     sshClient.on('ready', () => {
         sshClient.forwardOut(
@@ -152,6 +155,9 @@ const SSHConnection = new Promise((resolve, reject) => {
                  ...dbServer,
                  stream
             };
+
+            //connect to mysql database    
+
             const connection =  mysql.createConnection({...dbServer,stream});
             
             connection.connect((error) => {
@@ -202,10 +208,13 @@ const SSHConnection = new Promise((resolve, reject) => {
                         var config={
                             icon:markericon,
                             customID:i
+                            
                         }
                         finalresults[i].stationID=results[i].id
                         finalresults[i].area=results[i].area
                         finalresults[i].name=results[i].name
+
+                        //add new marker on the map
                         marker = new L.marker([results[i].lat, 
                             results[i].lng],config)
                             .bindPopup(finalresults[i].name+" "+finalresults[i].stationID)
@@ -254,6 +263,8 @@ const SSHConnection = new Promise((resolve, reject) => {
 
             setInterval(function() {
                 
+                //request new table every 30sec
+
                 connection.query(lastsql,function(error,results,fields){
                     unbalance=[];
                     sleeping=[];
@@ -310,7 +321,7 @@ const SSHConnection = new Promise((resolve, reject) => {
 });
 
 
-
+// real-time clock function
 
 function display_ct7() {
     var x = new Date()
