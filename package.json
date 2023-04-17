@@ -34,6 +34,8 @@
     "electron-squirrel-startup": "^1.0.0",
     "jquery": "^3.6.4",
     "leaflet": "^1.9.3",
+    "leaflet-providers": "^1.13.0",
+    "leaflet-routing-machine": "^3.2.12",
     "mysql": "^2.18.1",
     "mysql2": "^3.2.0",
     "ssh2": "^1.11.0"

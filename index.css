@@ -13,7 +13,7 @@ body,p {
     color: aliceblue;
     background-color: black;
     z-index: 2;
-    top: 0;
+    top: 15%;
     right: 0;
 }
 
@@ -21,19 +21,55 @@ body,p {
     position:absolute;
     display: none;
     background-color: rgba(255,255,255,0.48);
-    border-radius: 16px;
     box-shadow: 0 4px 30px rgba(0,0,0,0.1);
     backdrop-filter: blur(10.8px);
     -webkit-backdrop-filter: blur(10.8px);
-    border:1px solid rgba(255, 255, 255, 0.59);
     width: 20vw;
-    height: 60vh;
+    height: 100%;
     z-index: 2;
     top: 0;
     left: 0;
-    margin-top: 2%;
-    margin-left: 2%;
     font-size: 1rem;
+}
+
+#selection{
+    height: 10%;
+    color: aliceblue;
+    align-items: center;
+    justify-content: space-evenly;
+}
+
+ul {
+    height: 100%;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+  
+li {
+    float: left;
+    width: 25%;
+}
+
+li button{
+    display: block;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    width: 100%;
+    background-color: #3b383e;
+    border-style: none;
+    outline: none;
+}
+
+
+li button:hover:not(.active) {
+    opacity: .75;
+}
+
+.active {
+    background-color: #48c95c;
 }
 
 .bottom-container{
@@ -57,13 +93,10 @@ body,p {
     border-right: 0.1rem solid white;
 }
 
-#unbalace-list div[id^="list"] {
-    background-color: red;  
-}
 
 #unbalance-list{
     overflow: auto;
-    height: 90%;
+    height: 80%;
 }
 
 .total{
@@ -79,6 +112,48 @@ body,p {
     width: 100vw;
     height: 70vh;
 }
+
+#search-box{
+    position: absolute;
+    z-index: 2;
+    top: 20%;
+    right: 0;
+    background-color: black;
+    color: white;
+}
+
+#valid-msg{
+    position: absolute;
+    z-index: 2;
+    top: 30%;
+    right: 0;
+    background-color: rgb(49, 210, 34);
+    color: azure;
+    border-radius: 15px;
+    width: 15%;
+    border-style: solid;
+    border-color: white;
+    text-align: center;
+    opacity: 0;
+    transition: 1s opacity;
+}
+
+#invalid-msg{
+    position: absolute;
+    z-index: 2;
+    top: 30%;
+    right: 0;
+    background-color: rgb(210, 34, 34);
+    color: azure;
+    border-radius: 15px;
+    width: 15%;
+    border-style: solid;
+    border-color: white;
+    text-align: center;
+    opacity: 0;
+    transition: 1s opacity;
+}
+
 
 
 .chart-container{
@@ -135,3 +210,4 @@ body,p {
     height: 2.8rem;
     width: 25%;
 }
+
