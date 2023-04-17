@@ -1,5 +1,5 @@
 let { marker, layerGroup, icon, latLng } = require('leaflet');
-var mysql=require('mysql2');
+let mysql=require('mysql2');
 const { Client } = require('ssh2');
 const sshClient = new Client();
 
@@ -9,47 +9,47 @@ const ctx1 = document.getElementById('myChart1');
 const onehourchart = document.getElementById('hourchart');
 
 
-var stationblock=document.getElementById("mydiv");
-var stationname=document.getElementById("stationname");
-var total=document.getElementById("total");
-var bike=document.getElementById("bike");
-var free=document.getElementById("free");
+let stationblock=document.getElementById("mydiv");
+let stationname=document.getElementById("stationname");
+let total=document.getElementById("total");
+let bike=document.getElementById("bike");
+let free=document.getElementById("free");
 
-var gc=document.getElementById("goodcount");
-var sc=document.getElementById("sleepingcount");
-var ub=document.getElementById("unbalancecount");
+let gc=document.getElementById("goodcount");
+let sc=document.getElementById("sleepingcount");
+let ub=document.getElementById("unbalancecount");
 
-var list = document.getElementById("unbalance-list");
-var weathertype = document.getElementById("wtype");
-var temp = document.getElementById("temp");
-var humidity = document.getElementById("humidity");
-var tempmin = document.getElementById("tempmin");
-var tempmax = document.getElementById("tempmax");
-var pressure = document.getElementById("pressure");
-var wind = document.getElementById("wind");
-var cloud = document.getElementById("cloud");
-var rain = document.getElementById("rain");
+let list = document.getElementById("unbalance-list");
+let weathertype = document.getElementById("wtype");
+let temp = document.getElementById("temp");
+let humidity = document.getElementById("humidity");
+let tempmin = document.getElementById("tempmin");
+let tempmax = document.getElementById("tempmax");
+let pressure = document.getElementById("pressure");
+let wind = document.getElementById("wind");
+let cloud = document.getElementById("cloud");
+let rain = document.getElementById("rain");
 
-var unbalance=[];
-var sleeping=[];
-var nobikelist=[];
-var nospacelist=[];
+let unbalance=[];
+let sleeping=[];
+let nobikelist=[];
+let nospacelist=[];
 
 let date_ob = new Date();
 
-let date = ("0" + date_ob.getDate()).slice(-2);
+let day = ("0" + date_ob.getDate()).slice(-2);
 let month = ("0" + (date_ob.getMonth() + 1)).slice(-2);
 let year = date_ob.getFullYear();
 let hours = date_ob.getHours();
 let minutes = date_ob.getMinutes();
 let seconds = date_ob.getSeconds();
-console.log(year + "-" + month + "-" + date + " " + hours + ":" + minutes + ":" + seconds);
+console.log(year + "-" + month + "-" + day + " " + hours + ":" + minutes + ":" + seconds);
 
-var last=-1;
+let last=-1;
 
-var btn_sel="btn-all";
+let btn_sel="btn-all";
 
-var osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+let osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 	maxZoom: 16,
     minZoom: 14,
 	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -57,60 +57,61 @@ var osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 
 
 
-var allmarkergroup = L.layerGroup();
-var unbalancemarkergroup = L.layerGroup();
+let allmarkergroup = L.layerGroup();
+let unbalancemarkergroup = L.layerGroup();
 
-var map = L.map('map',{
+let map = L.map('map',{
     zoomControl:false,
     center:[22.62418, 120.30883],
     zoom:14,
     layers:[osm,allmarkergroup]
 });
-var overlayMaps={
+let overlayMaps={
     "所有站點":allmarkergroup,
     "不平衡站點":unbalancemarkergroup
 }
 L.control.layers(overlayMaps).addTo(map);
 
 
-var safe = L.icon({
+let safe = L.icon({
     iconUrl: './img/safe.png',
     iconSize:     [36, 36],
     iconAnchor: [18,36],
     popupAnchor:  [0, -16]
 });
 
-var nobike = L.icon({
+let nobike = L.icon({
     iconUrl: './img/nobike.png',
     iconSize:     [36, 36],
     iconAnchor: [18,36],
     popupAnchor:  [0, -16]
 });
 
-var nospace = L.icon({
+let nospace = L.icon({
     iconUrl: './img/nospace.png',
     iconSize:     [36, 36],
     iconAnchor: [18,36],
     popupAnchor:  [0, -16]
 });
 
-var sleep = L.icon({
+let sleep = L.icon({
     iconUrl:'./img/sleep.png',
     iconSize: [36,36],
     iconAnchor: [18,36],
     popupAnchor:  [0, -16]
 })
 
-var truck = L.icon({
+let truck = L.icon({
     iconUrl:'./img/truck.png',
     iconSize:[36,36],
     iconAnchor:[18,36],
 })
 
-var weathersql='SELECT * FROM last_weather';
-var sql='SELECT id,name,area,lat,lng,bike,freespace,total,active FROM stationinfo INNER JOIN last_update ON stationinfo.id = last_update.stationID ORDER BY id ASC';
-//var sql='SELECT * FROM stationinfo ORDER BY id ASC';
-var lastsql='SELECT * FROM last_update ORDER BY stationID ASC';
+let weathersql='SELECT * FROM last_weather';
+//let sql='SELECT id,name,area,lat,lng,bike,freespace,total,active,recordTime FROM stationinfo INNER JOIN station_record ON stationinfo.id = station_record.stationID where recordTime = `2023-04-01 00:00:26` ORDER BY id ASC '
+let sql='SELECT id,name,area,lat,lng,bike,freespace,total,active FROM stationinfo INNER JOIN last_update ON stationinfo.id = last_update.stationID ORDER BY id ASC';
+//let sql='SELECT * FROM stationinfo ORDER BY id ASC';
+let lastsql='SELECT * FROM last_update ORDER BY stationID ASC';
 
 const dbServer = {
     host: '127.0.0.1',
@@ -162,7 +163,7 @@ const SSHConnection = new Promise((resolve, reject) => {
             else{
                 
                 // connection.query(lastsql,function(error,results,fields){
-                //     for(var i=0;i<results.length;i++){
+                //     for(let i=0;i<results.length;i++){
                 //         finalresults.push(results[i]);
                 //     }
                 // })
@@ -181,8 +182,8 @@ const SSHConnection = new Promise((resolve, reject) => {
                 //initialize station info
                 connection.query(sql,function(error,results,fields){
                     console.log("Connected to MySQL Server");
-                    for(var i=0;i<results.length;i++){
-                        var markericon;
+                    for(let i=0;i<results.length;i++){
+                        let markericon;
                         if(results[i].active==0){
                             markericon=sleep;
                             sleeping.push(results[i]);
@@ -203,7 +204,7 @@ const SSHConnection = new Promise((resolve, reject) => {
                                 markericon=safe;
                             }
                         }
-                        var config={
+                        let config={
                             icon:markericon,
                             customID:i,
                             stationid:results[i].id,
@@ -219,11 +220,11 @@ const SSHConnection = new Promise((resolve, reject) => {
                             .bindPopup(results[i].name+" "+results[i].id)
                             .on('click',function(){
                                 map.setView(this.getLatLng(),16);
-                                var getstationsql = 'SELECT recordTime, (bike-freespace) as balance FROM station_record where recordTime > date_add(now(), interval 8 hour) - interval 1 hour and stationID =  ';
+                                let getstationsql = 'SELECT recordTime, (bike-freespace) as balance FROM station_record where recordTime > date_add(now(), interval 8 hour) - interval 1 hour and stationID =  ';
                                 getstationsql+=this.options.stationid;
 
                                 connection.query(getstationsql,function(error,results,fields){
-                                    for(var i=0;i<results.length;i++){
+                                    for(let i=0;i<results.length;i++){
                                         console.log(results[i].recordTime)
                                     }
                                 })
@@ -294,7 +295,7 @@ const SSHConnection = new Promise((resolve, reject) => {
                         }
                     })
                     
-                    // for(var i=0;i<results.length;i++){
+                    // for(let i=0;i<results.length;i++){
                     //     if(finalresults[i].active==0){
                     //         markerlist[i].setIcon(sleep);
                     //         sleeping.push(finalresults[i]);
@@ -339,7 +340,7 @@ const SSHConnection = new Promise((resolve, reject) => {
 });
 
 
-var previous=document.getElementById("btn-all")
+let previous=document.getElementById("btn-all")
 
 document.querySelectorAll('li button').forEach(occurence => {
     let id = occurence.getAttribute('id'); 
@@ -359,14 +360,14 @@ document.querySelectorAll('li button').forEach(occurence => {
 });
 
 function createlist(btn){
-    var htmlElements = "";
+    let htmlElements = "";
     if(btn=="btn-all"){
-        for (var i = 0; i < unbalance.length; i++) {
+        for (let i = 0; i < unbalance.length; i++) {
             htmlElements += '<div id="list'+i+'"></div>';
         }                    
         list.innerHTML = htmlElements;
-        for (var i = 0; i < unbalance.length; i++) {
-            var li=document.getElementById("list"+i);
+        for (let i = 0; i < unbalance.length; i++) {
+            let li=document.getElementById("list"+i);
             li.innerHTML=unbalance[i].stationID;
             li.style.color="aliceblue";
             if(unbalance[i].active==0){
@@ -383,36 +384,36 @@ function createlist(btn){
         } 
     }
     else if(btn=="btn-mod"){
-        for (var i = 0; i < sleeping.length; i++) {
+        for (let i = 0; i < sleeping.length; i++) {
             htmlElements += '<div id="list'+i+'"></div>';
         }                    
         list.innerHTML = htmlElements;
-        for (var i = 0; i < sleeping.length; i++) {
-            var li=document.getElementById("list"+i);
+        for (let i = 0; i < sleeping.length; i++) {
+            let li=document.getElementById("list"+i);
             li.innerHTML=sleeping[i].name;
             li.style.color="aliceblue";
             li.style.background="#35342F";
         } 
     }
     else if(btn=="btn-full"){
-        for (var i = 0; i < nospacelist.length; i++) {
+        for (let i = 0; i < nospacelist.length; i++) {
             htmlElements += '<div id="list'+i+'"></div>';
         }                    
         list.innerHTML = htmlElements;
-        for (var i = 0; i < nospacelist.length; i++) {
-            var li=document.getElementById("list"+i);
+        for (let i = 0; i < nospacelist.length; i++) {
+            let li=document.getElementById("list"+i);
             li.innerHTML=nospacelist[i].name;
             li.style.color="aliceblue";
             li.style.background="#E7C63C";
         } 
     }
     else{
-        for (var i = 0; i < nobikelist.length; i++) {
+        for (let i = 0; i < nobikelist.length; i++) {
             htmlElements += '<div id="list'+i+'"></div>';
         }                    
         list.innerHTML = htmlElements;
-        for (var i = 0; i < nobikelist.length; i++) {
-            var li=document.getElementById("list"+i);
+        for (let i = 0; i < nobikelist.length; i++) {
+            let li=document.getElementById("list"+i);
             li.innerHTML=nobikelist[i].name;
             li.style.color="aliceblue";
             li.style.background="#E74C3C";
@@ -423,8 +424,8 @@ function createlist(btn){
 
 
 function search_station(){
-    var searchid = document.getElementById("site-search").value
-    var nomatch=true;
+    let searchid = document.getElementById("site-search").value
+    let nomatch=true;
     allmarkergroup.eachLayer(function (layer){
         if(searchid==layer.options.stationid){
 
@@ -446,7 +447,7 @@ function search_station(){
             
         }
     })
-    // for(var i=0;i<markerlist.length;i++){
+    // for(let i=0;i<markerlist.length;i++){
     //     if(Number(searchid)==markerlist[i].options.stationid){
 
     //         msg=document.getElementById("valid-msg");
@@ -477,34 +478,34 @@ function search_station(){
     }
 }
 
-
+const date = new Date('April 1, 2023, 00:00:00');
 // real-time clock function
 function display_ct7() {
-    var x = new Date()
-    var ampm = x.getHours( ) >= 12 ? ' PM' : ' AM';
-    hours = x.getHours( ) % 12;
-    hours = hours ? hours : 12;
-    hours=hours.toString().length==1? 0+hours.toString() : hours;
+    //let x = new Date('April 1, 2023, 00:00:00')
+
+    let hours = date.getHours().toString();
+    hours=hours.length==1? 0+hours : hours;
     
-    var minutes=x.getMinutes().toString()
+    let minutes=date.getMinutes().toString()
     minutes=minutes.length==1 ? 0+minutes : minutes;
     
-    var seconds=x.getSeconds().toString()
+    let seconds=date.getSeconds().toString()
     seconds=seconds.length==1 ? 0+seconds : seconds;
     
-    var month=(x.getMonth() +1).toString();
+    let month=(date.getMonth() +1).toString();
     month=month.length==1 ? 0+month : month;
     
-    var dt=x.getDate().toString();
+    let dt=date.getDate().toString();
     dt=dt.length==1 ? 0+dt : dt;
     
-    var x1=month + "/" + dt + "/" + x.getFullYear(); 
-    x1 = x1 + " - " +  hours + ":" +  minutes + ":" +  seconds + " " + ampm;
+    let x1=month + "/" + dt + "/" + date.getFullYear(); 
+    x1 = x1 + " - " +  hours + ":" +  minutes + ":" +  seconds + " ";
     document.getElementById('ct7').innerHTML = x1;
     display_c7();
 }
 function display_c7(){
-        var refresh=1000; // Refresh rate in milli seconds
+        let refresh=1000; // Refresh rate in milli seconds
+        date.setSeconds(date.getSeconds() + 1);
         mytime=setTimeout('display_ct7()',refresh)
 }
 display_c7()
@@ -537,7 +538,7 @@ new Chart(ctx, {
     }
 });
 
-var timeFormat='%HH:%MM';
+let timeFormat='%HH:%MM';
 
 new Chart(ctx1, {
     type: 'line',
