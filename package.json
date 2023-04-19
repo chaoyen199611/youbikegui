@@ -31,6 +31,7 @@
   },
   "dependencies": {
     "@elfalem/leaflet-curve": "^0.9.2",
+    "@types/leaflet-routing-machine": "^3.2.4",
     "chart.js": "^4.2.1",
     "electron-squirrel-startup": "^1.0.0",
     "jquery": "^3.6.4",

@@ -7,34 +7,23 @@
     style-src-elem 'self' https://unpkg.com;
     script-src-elem 'self' https://elfalem.github.io/Leaflet.curve/src/leaflet.curve.js https://unpkg.com https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js 
     https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js https://cdn.jsdelivr.net/npm/chart.js;
-    img-src 'self' https://unpkg.com https://tile.openstreetmap.org https://tiles.stadiamaps.com data:;
-    connect-src 'self' data:;
+    img-src 'self' https://unpkg.com https://tile.openstreetmap.org https://a.tile.jawg.io/ https://b.tile.jawg.io/ https://c.tile.jawg.io/ https://d.tile.jawg.io/ data:;
+    connect-src 'self' https://router.project-osrm.org/route/v1/driving/ data:;
     script-src 'self' 'unsafe-eval' 'unsafe-hashes' 'unsafe-inline';">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
     integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI="
     crossorigin=""/>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
-    <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+    <link rel="stylesheet" href="leaflet-routing-machine.css" />
+    <link rel="stylesheet" href="index.css">
     <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
     integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM="
     crossorigin=""></script>
-    <script src="https://elfalem.github.io/Leaflet.curve/src/leaflet.curve.js"></script>
-    <link rel="stylesheet" href="index.css">
     
     <title>Youbike2.0 KTown</title>
   </head>
   <body>
     
     <div class="container">
-      <div id="ct7"></div>
-      <div id="search-box">
-        <label for="site-search">搜尋站點</label><br>
-        <input type="search" placeholder="輸入ID"id="site-search" name="q">
-        <button onclick="search_station()">搜尋</button>
-      </div>
-      <div id="invalid-msg">無效ID</div>  
-      <div id="valid-msg">查詢成功</div> 
       <div id="map"></div>
       <div class="icon-list">圖示標記 &#9660<br>
           <img src="img/safe.png" width="16" height="16">營運
@@ -48,6 +37,20 @@
         <div id="total"></div>
         <div id="bike"></div>
         <div id="free"></div>
+        <div id="triprecord-title">近一小時站點借還狀況</div>
+        <div id="table-wrapper">
+          <div id="table-scroll">  
+            <table id="tableData">
+              <thead>
+                <tr>
+                    <th><span class="text">借還時間</span></th>
+                    <th><span class="text">借／還</span></th>
+                    <th><span class="text">借還站點</span></th>
+                </tr>
+              </thead>
+            </table>
+          </div>
+        </div>
         <div id="triprecord"></div>
       </div>
       
@@ -94,16 +97,22 @@
         </div>
       </div>
       <div class="dummy2">
-        
+        <div id="ct7"></div>
+        <div id="search-box">
+          <label for="site-search">搜尋站點</label><br>
+          <input type="search" placeholder="輸入ID"id="site-search" name="q">
+          <button onclick="search_station()">搜尋</button>
+        </div>
+        <div id="invalid-msg">無效ID</div>  
+        <div id="valid-msg">查詢成功</div> 
       </div>  
     </div>
-    
-    
+    <script src="leaflet-routing-machine.js"></script>
     <script src="leaflet.curve.js"></script>
+    <script src="leaflet-providers.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
-    <script src="leaflet-providers.js"></script>
     <script defer src="renderer.js"></script>
   </body>
 </html>

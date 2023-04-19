@@ -1,7 +1,10 @@
 let { marker, layerGroup, icon, latLng } = require('leaflet');
+let {control} = require('leaflet-routing-machine');
+let {provider} = require('leaflet-providers');
 let {curve,Curve} = require('@elfalem/leaflet-curve');
-let mysql=require('mysql');
 
+let mysql=require('mysql');
+let rebalancepoint=[L.latLng(22.6317876, 120.3038053)]
 const ctx = document.getElementById('myChart');
 const ctx1 = document.getElementById('myChart1');
 const onehourchart = document.getElementById('hourchart');
@@ -44,9 +47,11 @@ const datesAreOnSameDay = (first, second) =>
     first.getSeconds() === second.getSeconds();
 
 let last=-1;
-let btn_sel="btn-all";
+let btn_sel="btn-all";    
 
-let osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+
+let osm = L.tileLayer.provider('Jawg.Streets', {
+    accessToken: 'tyv8SuGPBrZkqBtfuwlOAIDaRP9QHksdNVJBx2ErYlwI00PE2DsskocSnmBzHon7',
 	maxZoom: 16,
     minZoom: 13,
 	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -171,7 +176,8 @@ else{
                 total:results[i].total_space,
                 freespace:results[i].freespace,
                 bike:results[i].bike,
-                active:results[i].active
+                active:results[i].active,
+                area:results[i].area
             }
             //add new marker on the map
             marker = new L.marker([results[i].lat, 
@@ -190,9 +196,9 @@ else{
                         createtriplist(results,id);
                     })
                     stationname.innerHTML = this.options.name;
-                    total.innerHTML = "total: "+this.options.total;                               
-                    bike.innerHTML = "bike: "+this.options.bike;             
-                    free.innerHTML = "free: "+this.options.freespace;
+                    total.innerHTML = "總車位數: "+this.options.total;                               
+                    bike.innerHTML = "目前提供車輛: "+this.options.bike;             
+                    free.innerHTML = "目前提供車位: "+this.options.freespace;
                     if(stationblock.style.display==="none"||(last!=this.options.customID)){
                         last=this.options.customID;
                         stationblock.style.display="block";
@@ -207,6 +213,21 @@ else{
             }
             
         }
+        
+        unbalancemarkergroup.eachLayer(function (layer){
+            if(layer.options.area=="鹽埕區"||layer.options.area=="前金區"||layer.options.area=="苓雅區"||layer.options.area=="鼓山區"||layer.options.area=="新興區"){
+                console.log(layer.options.stationid);
+                rebalancepoint.push(layer._latlng);
+                
+            }
+        })
+        console.log(rebalancepoint)
+        let route = L.Routing.control({
+        waypoints: rebalancepoint,
+        routeWhileDragging: false,
+        createMarker: function() { return null; }
+        }).addTo(map);
+        
         gc.innerHTML=1201-sleeping.length-unbalance.length;
         sc.innerHTML=sleeping.length;
         ub.innerHTML=unbalance.length-sleeping.length;
@@ -220,6 +241,7 @@ else{
 
 function update_data() {
     //request new table every 30sec
+    rebalancepoint=[L.latLng(22.6317876, 120.3038053)]
     let currtime = nextdate
     currtime.setHours(currtime.getHours()+8);
     currtime = currtime.toISOString().replace('T',' ').slice(0,19);
@@ -270,6 +292,12 @@ function update_data() {
             console.log(error);
         }
     })
+    unbalancemarkergroup.eachLayer(function(layer){
+        rebalancepoint.push(layer._latlng);
+    })
+    updateRoute = function () {
+        routingControl.getPlan().setWaypoints(rebalancepoint);
+    };
 };
 
 
@@ -292,68 +320,98 @@ document.querySelectorAll('li button').forEach(occurence => {
     } );
 });
 
+function addTableRow(results,current){
+    let table = document.getElementById("tableData");
+    
+    let st="";
+    let parse=[];
+    let type="";
+    for(let i=0;i<results.length;i++){
+        let rowCount = table.rows.length;
+        let row = table.insertRow(rowCount);
+        if(results[i].start===current){
+            st =results[i].start_time.toString();
+            parse = st.split(' ');
+            current = results[i].end;
+            type="借";
+        }
+        else{
+            st =results[i].start_time.toString();
+            parse = st.split(' '); 
+            current = results[i].start;
+            type="還";   
+        }
+        row.insertCell(0).innerHTML= parse[4];
+        row.insertCell(1).innerHTML= type;
+        row.insertCell(2).innerHTML= current;
+    }
+}
+
 function createtriplist(results,current){
     let htmlElements = "";
+    let start,end;
+    addTableRow(results,current);
     for (let i = 0; i < results.length; i++) {
         htmlElements += '<div id="triplist'+i+'"></div>';
+        
     }                    
     triplist.innerHTML = htmlElements;
     //let polyline = L.polyline(latlngs, {color: 'red'}).addTo(map);
-    for (let i = 0; i < results.length; i++) {
-        let li=document.getElementById("triplist"+i);
-        li.innerHTML=results[i].start;
-        li.style.color="aliceblue";
-        if(results[i].start===current){
-            li.style.background="#35342F";
-
-        }
-        else{
-            li.style.background="#E74C3C";
-    
-        }
-        let start,end;
-        allmarkergroup.eachLayer(function (layer){
-            if(layer.options.stationid===results[i].start){
-                start=layer;
+    if(results.length===0){
+        console.log("none");
+    }   
+    else{
+        for (let i = 0; i < results.length; i++) {
+            let li=document.getElementById("triplist"+i);
+            li.innerHTML=results[i].start;
+            li.style.color="aliceblue";
+            if(results[i].start===current){
+                let st =results[i].start_time.toString();
+                let parse = st.split(' ');
+                li.style.background="#35342F";
+                li.innerHTML=parse[4];
             }
-            if(layer.options.stationid===results[i].end){
-                end=layer;
-            } 
-        });
-        let latlng1 = [start._latlng.lat, start._latlng.lng],
-            latlng2 = [end._latlng.lat, end._latlng.lng];
-        let offsetX = latlng2[1] - latlng1[1],
-            offsetY = latlng2[0] - latlng1[0];
-        let r = Math.sqrt(Math.pow(offsetX, 2) + Math.pow(offsetY, 2)),
-            theta = Math.atan2(offsetY, offsetX);
-        let thetaOffset = (3.14 / 10);
-        let r2 = (r / 2) / (Math.cos(thetaOffset)),
-            theta2 = theta + thetaOffset;
-        let midpointX = (r2 * Math.cos(theta2)) + latlng1[1],
-            midpointY = (r2 * Math.sin(theta2)) + latlng1[0];
-        let midpointLatLng = [midpointY, midpointX];
-        let pathOptions = {
-            color: 'red',
-            weight: 3
-        }
-        let curvedPath = L.curve([
-                'M', latlng1,
-                'Q', midpointLatLng,
-                latlng2
-            ], pathOptions).addTo(map);
+            else{
+                let st =results[i].start_time.toString();
+                let parse = st.split(' ');
+                li.style.background="#E74C3C";
+                li.innerHTML=parse[4];
+        
+            }
+            allmarkergroup.eachLayer(function (layer){
+                if(layer.options.stationid===results[i].start){
+                    start=layer;
+                }
+                if(layer.options.stationid===results[i].end){
+                    end=layer;
+                } 
+            });
+            // let latlng1 = [start._latlng.lat, start._latlng.lng],
+            //     latlng2 = [end._latlng.lat, end._latlng.lng];
+            // let offsetX = latlng2[1] - latlng1[1],
+            //     offsetY = latlng2[0] - latlng1[0];
+            // let r = Math.sqrt(Math.pow(offsetX, 2) + Math.pow(offsetY, 2)),
+            //     theta = Math.atan2(offsetY, offsetX);
+            // let thetaOffset = (3.14 / 10);
+            // let r2 = (r / 2) / (Math.cos(thetaOffset)),
+            //     theta2 = theta + thetaOffset;
+            // let midpointX = (r2 * Math.cos(theta2)) + latlng1[1],
+            //     midpointY = (r2 * Math.sin(theta2)) + latlng1[0];
+            // let midpointLatLng = [midpointY, midpointX];
+            // let pathOptions = {
+            //     color: 'red',
+            //     weight: 3
+            // }
+            // let curvedPath = L.curve([
+            //         'M', latlng1,
+            //         'Q', midpointLatLng,
+            //         latlng2
+            //     ], pathOptions).addTo(map);
 
+        }
     }
     
 }
-// var path=L.curve(['M',[50.54136296522163,28.520507812500004],
-// 					'C',[52.214338608258224,28.564453125000004],
-// 						[48.45835188280866,33.57421875000001],
-// 						[50.680797145321655,33.83789062500001],
-// 					'V',[48.40003249610685],
-// 					'L',[47.45839225859763,31.201171875],
-// 						[48.40003249610685,28.564453125000004],'Z'],
-// 					{color:'red',fill:true}).addTo(map);
-
     
 function createlist(btn){
     let htmlElements = "";

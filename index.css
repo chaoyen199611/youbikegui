@@ -9,12 +9,7 @@ body,p {
 }
 
 #ct7{
-    position:absolute;
     color: aliceblue;
-    background-color: black;
-    z-index: 2;
-    top: 15%;
-    right: 0;
 }
 
 #mydiv{
@@ -114,23 +109,13 @@ li button:hover:not(.active) {
 }
 
 #search-box{
-    position: absolute;
-    z-index: 2;
-    top: 20%;
-    right: 0;
-    background-color: black;
     color: white;
 }
 
 #valid-msg{
-    position: absolute;
-    z-index: 2;
-    top: 30%;
-    right: 0;
     background-color: rgb(49, 210, 34);
     color: azure;
     border-radius: 15px;
-    width: 15%;
     border-style: solid;
     border-color: white;
     text-align: center;
@@ -139,14 +124,9 @@ li button:hover:not(.active) {
 }
 
 #invalid-msg{
-    position: absolute;
-    z-index: 2;
-    top: 30%;
-    right: 0;
     background-color: rgb(210, 34, 34);
     color: azure;
     border-radius: 15px;
-    width: 15%;
     border-style: solid;
     border-color: white;
     text-align: center;
@@ -154,7 +134,30 @@ li button:hover:not(.active) {
     transition: 1s opacity;
 }
 
-
+#table-wrapper {
+    position:relative;
+    transform: translateX(-10%)
+}
+#table-scroll {
+    height:150px;
+    overflow:auto;  
+    margin-top:20px;
+}
+#table-wrapper table {
+    width:100%;  
+}
+#table-wrapper table * {
+    background:yellow;
+    color:black;
+}
+#table-wrapper table .text {
+    position:absolute;   
+    top:-20px;
+    z-index:2;
+    height:20px;
+    width:35%;
+    border:1px solid red;
+}
 
 .chart-container{
     
