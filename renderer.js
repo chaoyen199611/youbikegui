@@ -1,8 +1,6 @@
 let { marker, layerGroup, icon, latLng } = require('leaflet');
-let mysql=require('mysql2');
-const { Client } = require('ssh2');
-const sshClient = new Client();
-
+let {curve,Curve} = require('@elfalem/leaflet-curve');
+let mysql=require('mysql');
 
 const ctx = document.getElementById('myChart');
 const ctx1 = document.getElementById('myChart1');
@@ -20,6 +18,7 @@ let sc=document.getElementById("sleepingcount");
 let ub=document.getElementById("unbalancecount");
 
 let list = document.getElementById("unbalance-list");
+let triplist = document.getElementById("triprecord");
 let weathertype = document.getElementById("wtype");
 let temp = document.getElementById("temp");
 let humidity = document.getElementById("humidity");
@@ -35,30 +34,27 @@ let sleeping=[];
 let nobikelist=[];
 let nospacelist=[];
 
-let date_ob = new Date();
+const date = new Date('April 1, 2023, 06:50:20');
+const nextdate = new Date('April 1, 2023 06:51:14');
 
-let day = ("0" + date_ob.getDate()).slice(-2);
-let month = ("0" + (date_ob.getMonth() + 1)).slice(-2);
-let year = date_ob.getFullYear();
-let hours = date_ob.getHours();
-let minutes = date_ob.getMinutes();
-let seconds = date_ob.getSeconds();
-console.log(year + "-" + month + "-" + day + " " + hours + ":" + minutes + ":" + seconds);
+const datesAreOnSameDay = (first, second) =>
+    first.getDate() === second.getDate()   &&
+    first.getHours() === second.getHours() &&
+    first.getMinutes() === second.getMinutes() &&
+    first.getSeconds() === second.getSeconds();
 
 let last=-1;
-
 let btn_sel="btn-all";
 
 let osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 	maxZoom: 16,
-    minZoom: 14,
+    minZoom: 13,
 	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 });
 
-
-
 let allmarkergroup = L.layerGroup();
 let unbalancemarkergroup = L.layerGroup();
+
 
 let map = L.map('map',{
     zoomControl:false,
@@ -66,6 +62,8 @@ let map = L.map('map',{
     zoom:14,
     layers:[osm,allmarkergroup]
 });
+
+
 let overlayMaps={
     "所有站點":allmarkergroup,
     "不平衡站點":unbalancemarkergroup
@@ -107,237 +105,172 @@ let truck = L.icon({
     iconAnchor:[18,36],
 })
 
-let weathersql='SELECT * FROM last_weather';
-//let sql='SELECT id,name,area,lat,lng,bike,freespace,total,active,recordTime FROM stationinfo INNER JOIN station_record ON stationinfo.id = station_record.stationID where recordTime = `2023-04-01 00:00:26` ORDER BY id ASC '
-let sql='SELECT id,name,area,lat,lng,bike,freespace,total,active FROM stationinfo INNER JOIN last_update ON stationinfo.id = last_update.stationID ORDER BY id ASC';
-//let sql='SELECT * FROM stationinfo ORDER BY id ASC';
-let lastsql='SELECT * FROM last_update ORDER BY stationID ASC';
 
-const dbServer = {
+let initsql="SELECT id,name,area,lat,lng,bike,freespace,total_space,active,recordTime FROM stationinfo INNER JOIN test ON stationinfo.id = test.stationID where recordTime = '2023-04-01 06:50:26' ORDER BY id ASC ";
+//let sql='SELECT id,name,area,lat,lng,bike,freespace,total,active FROM stationinfo INNER JOIN last_update ON stationinfo.id = last_update.stationID ORDER BY id ASC';
+//let sql='SELECT * FROM stationinfo ORDER BY id ASC';
+
+function getweather(connect){
+    let weathersql="SELECT * FROM weather_record where update_time = '2023-04-01 00:00:26'";
+    connect.query(weathersql,function(error,results,fields){
+        temp.innerHTML=results["temp"];
+        humidity.innerHTML=results["humidity"];
+        tempmin.innerHTML=results["temp_min"];
+        tempmax.innerHTML=results["temp_max"];
+        pressure.innerHTML=results["pressure"];
+        wind.innerHTML=results["wind"];
+        cloud.innerHTML=results["cloud"];
+        rain.innerHTML =results["rain"];
+        document.getElementById("wtype").innerHTML=results["weather"];
+        
+    })
+}
+
+const connection =  mysql.createConnection({
     host: '127.0.0.1',
     port: '3306',
-    user: 'joey',
+    user: 'joeyhuang',
     password: 'open0813',
     database: 'youbike'
-}
-const tunnelConfig = {
-    host: '10.1.30.250',
-    port: 22,
-    username: 'joey',
-    password: 'open0813'
-}
-const forwardConfig = {
-    srcHost: '127.0.0.1',
-    srcPort: 3307,
-    dstHost: dbServer.host,
-    dstPort: dbServer.port
-};
-
-
-
-
-
-// create a ssh connection to server
-const SSHConnection = new Promise((resolve, reject) => {
-    sshClient.on('ready', () => {
-        sshClient.forwardOut(
-        forwardConfig.srcHost,
-        forwardConfig.srcPort,
-        forwardConfig.dstHost,
-        forwardConfig.dstPort,
-        (err, stream) => {
-             if (err) reject(err);
-             const updatedDbServer = {
-                 ...dbServer,
-                 stream
-            };
-
-            //connect to mysql database    
-
-            const connection =  mysql.createConnection({...dbServer,stream});
-            
-            connection.connect((error) => {
-            if(error){
-                console.log("error occurred", error);
-            } 
-            else{
-                
-                // connection.query(lastsql,function(error,results,fields){
-                //     for(let i=0;i<results.length;i++){
-                //         finalresults.push(results[i]);
-                //     }
-                // })
-                connection.query(weathersql,function(error,results,fields){
-                    temp.innerHTML=results[0]["temp"];
-                    humidity.innerHTML=results[0]["humidity"];
-                    tempmin.innerHTML=results[0]["temp_min"];
-                    tempmax.innerHTML=results[0]["temp_max"];
-                    pressure.innerHTML=results[0]["pressure"];
-                    wind.innerHTML=results[0]["wind"];
-                    cloud.innerHTML=results[0]["cloud"];
-                    rain.innerHTML =results[0]["rain"];
-                    document.getElementById("wtype").innerHTML=results[0]["weather"];
-                    
-                })
-                //initialize station info
-                connection.query(sql,function(error,results,fields){
-                    console.log("Connected to MySQL Server");
-                    for(let i=0;i<results.length;i++){
-                        let markericon;
-                        if(results[i].active==0){
-                            markericon=sleep;
-                            sleeping.push(results[i]);
-                            unbalance.push(results[i]);
-                        }
-                        else{
-                            if(results[i].freespace==0){
-                                markericon=nospace;
-                                unbalance.push(results[i])
-                                nospacelist.push(results[i])
-                            }
-                            else if(results[i].bike==0){
-                                markericon=nobike;
-                                unbalance.push(results[i]);
-                                nobikelist.push(results[i]);
-                            }
-                            else{
-                                markericon=safe;
-                            }
-                        }
-                        let config={
-                            icon:markericon,
-                            customID:i,
-                            stationid:results[i].id,
-                            name:results[i].name,
-                            total:results[i].total,
-                            freespace:results[i].freespace,
-                            bike:results[i].bike,
-                            active:results[i].active
-                        }
-                        //add new marker on the map
-                        marker = new L.marker([results[i].lat, 
-                            results[i].lng],config)
-                            .bindPopup(results[i].name+" "+results[i].id)
-                            .on('click',function(){
-                                map.setView(this.getLatLng(),16);
-                                let getstationsql = 'SELECT recordTime, (bike-freespace) as balance FROM station_record where recordTime > date_add(now(), interval 8 hour) - interval 1 hour and stationID =  ';
-                                getstationsql+=this.options.stationid;
-
-                                connection.query(getstationsql,function(error,results,fields){
-                                    for(let i=0;i<results.length;i++){
-                                        console.log(results[i].recordTime)
-                                    }
-                                })
-                                stationname.innerHTML = this.options.name;
-                                total.innerHTML = "total: "+this.options.total;                               
-                                bike.innerHTML = "bike: "+this.options.bike;             
-                                free.innerHTML = "free: "+this.options.freespace;
-                                if(stationblock.style.display==="none"||(last!=this.options.customID)){
-                                    last=this.options.customID;
-                                    stationblock.style.display="block";
-                                }
-                                else{
-                                    stationblock.style.display="none";
-                                }
-                        });
-                        allmarkergroup.addLayer(marker);
-                        if(markericon==nospace||markericon==nobike){
-                            unbalancemarkergroup.addLayer(marker);
-                        }
-                        
-                    }
-                    gc.innerHTML=1201-sleeping.length-unbalance.length;
-                    sc.innerHTML=sleeping.length;
-                    ub.innerHTML=unbalance.length-sleeping.length;
-
-                    createlist(btn_sel);                    
-                    
-                });
-                
-                //add truck dummy data, position at 美麗島站
-                marker = new L.marker([22.6317876, 120.3038053],{icon:truck}).addTo(map);
-                
-            }
-            });
-            
-
-            setInterval(function() {
-                //request new table every 30sec
-                connection.query(lastsql,function(error,results,fields){
-                    allmarkergroup.eachLayer(function (layer){
-                        layer.options.freespace=results[layer.options.customID].freespace;
-                        layer.options.bike=results[layer.options.customID].bike;
-                        layer.options.active=results[layer.options.customID].active;
-                        if(layer.options.icon==nobike||layer.options.icon==nospace){
-                            unbalancemarkergroup.removeLayer(layer);
-                        }
-                        if(layer.options.active==0){
-                            layer.setIcon(sleep);
-                        }
-                        else{
-                            if(layer.options.bike==0){
-                                layer.setIcon(nobike);
-                                unbalancemarkergroup.addLayer(layer);
-                            }
-                            else if(layer.options.freespace==0){
-                                layer.setIcon(nospace);
-                                unbalancemarkergroup.addLayer(layer);
-                            }
-                            else{
-                                layer.setIcon(safe);
-                            }
-                        }
-                        if(layer.options.customID==last){
-                            if(stationblock.style.display==="block"){
-                                bike.innerHTML="bike: "+layer.options.bike;
-                                free.innerHTML="free: "+layer.options.freespace;
-                            }
-                        }
-                    })
-                    
-                    // for(let i=0;i<results.length;i++){
-                    //     if(finalresults[i].active==0){
-                    //         markerlist[i].setIcon(sleep);
-                    //         sleeping.push(finalresults[i]);
-                    //         unbalance.push(finalresults[i]);
-                    //     }
-                    //     else{
-                    //         if(finalresults[i].freespace==0){
-                    //             unbalancemarkergroup.addLayer(markerlist[i])
-                    //             markerlist[i].setIcon(nospace);
-                                
-                    //         }
-                    //         else if(finalresults[i].bike==0){
-                    //             unbalancemarkergroup.addLayer(markerlist[i])
-                                
-                    //         }
-                    //         else{
-                    //             markerlist[i].setIcon(safe);
-                    //         }
-                    //     }
- 
-                    // }
-
-                    createlist(btn_sel);
-
-                    gc.innerHTML=1201-sleeping.length-unbalance.length;
-                    sc.innerHTML=sleeping.length;
-                    ub.innerHTML=unbalance.length-sleeping.length;
-
-                    // if(stationblock.style.display==="block"){
-                    //     bike.innerHTML="bike: "+finalresults[last].bike;
-                    //     free.innerHTML="free: "+finalresults[last].freespace;
-                    // }
-                    console.log("update");
-                    if(error){
-                        console.log(error);
-                    }
-                })
-                
-            }, 30000);
-        });  
-    }).connect(tunnelConfig);
 });
+
+connection.connect((error) => {
+if(error){
+    console.log("error occurred", error);
+} 
+else{
+    //initialize station info
+    connection.query(initsql,function(error,results,fields){
+        for(let i=0;i<results.length;i++){
+            let markericon;
+            if(results[i].active==0){
+                markericon=sleep;
+                sleeping.push(results[i]);
+                unbalance.push(results[i]);
+            }
+            else{
+                if(results[i].freespace==0){
+                    markericon=nospace;
+                    unbalance.push(results[i])
+                    nospacelist.push(results[i])
+                }
+                else if(results[i].bike==0){
+                    markericon=nobike;
+                    unbalance.push(results[i]);
+                    nobikelist.push(results[i]);
+                }
+                else{
+                    markericon=safe;
+                }
+            }
+            let config={
+                icon:markericon,
+                customID:i,
+                stationid:results[i].id,
+                name:results[i].name,
+                total:results[i].total_space,
+                freespace:results[i].freespace,
+                bike:results[i].bike,
+                active:results[i].active
+            }
+            //add new marker on the map
+            marker = new L.marker([results[i].lat, 
+                results[i].lng],config)
+                .bindPopup(results[i].name+" "+results[i].id)
+                .on('click',function(){
+                    map.setView(this.getLatLng(),15);
+                    let tmptime = new Date(date)
+                    tmptime.setHours(tmptime.getHours()+8);
+                    tmptime = tmptime.toISOString().replace('T',' ').slice(0,19);
+                    tmptime = "'"+tmptime+"'";
+                    console.log(this.options.stationid);
+                    let id=this.options.stationid
+                    let tripsql="select * from triprecord where start_time > "+tmptime+" - interval 1 hour and start_time <= "+tmptime+" and (start = "+this.options.stationid.toString()+" or end = "+this.options.stationid.toString()+")";
+                    connection.query(tripsql,function(error,results,fields){
+                        createtriplist(results,id);
+                    })
+                    stationname.innerHTML = this.options.name;
+                    total.innerHTML = "total: "+this.options.total;                               
+                    bike.innerHTML = "bike: "+this.options.bike;             
+                    free.innerHTML = "free: "+this.options.freespace;
+                    if(stationblock.style.display==="none"||(last!=this.options.customID)){
+                        last=this.options.customID;
+                        stationblock.style.display="block";
+                    }
+                    else{
+                        stationblock.style.display="none";
+                    }
+            });
+            allmarkergroup.addLayer(marker);
+            if(markericon==nospace||markericon==nobike){
+                unbalancemarkergroup.addLayer(marker);
+            }
+            
+        }
+        gc.innerHTML=1201-sleeping.length-unbalance.length;
+        sc.innerHTML=sleeping.length;
+        ub.innerHTML=unbalance.length-sleeping.length;
+        createlist(btn_sel);                    
+    });
+    //add truck dummy data, position at 美麗島站
+    marker = new L.marker([22.6317876, 120.3038053],{icon:truck}).addTo(map);
+}
+});
+
+
+function update_data() {
+    //request new table every 30sec
+    let currtime = nextdate
+    currtime.setHours(currtime.getHours()+8);
+    currtime = currtime.toISOString().replace('T',' ').slice(0,19);
+    currtime = "'"+currtime+"'";
+    let nextsql="select * from test where recordTime = (select min(recordTime) from test where recordTime > "+currtime+")";
+    let currentsql="select * from test where recordTime = "+currtime+" ORDER BY stationID ASC";
+    connection.query(nextsql,function(error,results,fields){
+        nextdate.setTime(results[0].recordTime);
+    })
+    connection.query(currentsql,function(error,results,fields){
+        allmarkergroup.eachLayer(function (layer){
+            layer.options.freespace=results[layer.options.customID].freespace;
+            layer.options.bike=results[layer.options.customID].bike;
+            layer.options.active=results[layer.options.customID].active;
+            if(layer.options.icon==nobike||layer.options.icon==nospace){
+                unbalancemarkergroup.removeLayer(layer);
+            }
+            if(layer.options.active==0){
+                layer.setIcon(sleep);
+            }
+            else{
+                if(layer.options.bike==0){
+                    layer.setIcon(nobike);
+                    unbalancemarkergroup.addLayer(layer);
+                }
+                else if(layer.options.freespace==0){
+                    layer.setIcon(nospace);
+                    unbalancemarkergroup.addLayer(layer);
+                }
+                else{
+                    layer.setIcon(safe);
+                }
+            }
+            if(layer.options.customID==last){
+                if(stationblock.style.display==="block"){
+                    bike.innerHTML="bike: "+layer.options.bike;
+                    free.innerHTML="free: "+layer.options.freespace;
+                }
+            }
+        })
+        createlist(btn_sel);
+
+        gc.innerHTML=1201-sleeping.length-unbalance.length;
+        sc.innerHTML=sleeping.length;
+        ub.innerHTML=unbalance.length-sleeping.length;
+        console.log("update");
+        if(error){
+            console.log(error);
+        }
+    })
+};
 
 
 let previous=document.getElementById("btn-all")
@@ -359,6 +292,69 @@ document.querySelectorAll('li button').forEach(occurence => {
     } );
 });
 
+function createtriplist(results,current){
+    let htmlElements = "";
+    for (let i = 0; i < results.length; i++) {
+        htmlElements += '<div id="triplist'+i+'"></div>';
+    }                    
+    triplist.innerHTML = htmlElements;
+    //let polyline = L.polyline(latlngs, {color: 'red'}).addTo(map);
+    for (let i = 0; i < results.length; i++) {
+        let li=document.getElementById("triplist"+i);
+        li.innerHTML=results[i].start;
+        li.style.color="aliceblue";
+        if(results[i].start===current){
+            li.style.background="#35342F";
+
+        }
+        else{
+            li.style.background="#E74C3C";
+    
+        }
+        let start,end;
+        allmarkergroup.eachLayer(function (layer){
+            if(layer.options.stationid===results[i].start){
+                start=layer;
+            }
+            if(layer.options.stationid===results[i].end){
+                end=layer;
+            } 
+        });
+        let latlng1 = [start._latlng.lat, start._latlng.lng],
+            latlng2 = [end._latlng.lat, end._latlng.lng];
+        let offsetX = latlng2[1] - latlng1[1],
+            offsetY = latlng2[0] - latlng1[0];
+        let r = Math.sqrt(Math.pow(offsetX, 2) + Math.pow(offsetY, 2)),
+            theta = Math.atan2(offsetY, offsetX);
+        let thetaOffset = (3.14 / 10);
+        let r2 = (r / 2) / (Math.cos(thetaOffset)),
+            theta2 = theta + thetaOffset;
+        let midpointX = (r2 * Math.cos(theta2)) + latlng1[1],
+            midpointY = (r2 * Math.sin(theta2)) + latlng1[0];
+        let midpointLatLng = [midpointY, midpointX];
+        let pathOptions = {
+            color: 'red',
+            weight: 3
+        }
+        let curvedPath = L.curve([
+                'M', latlng1,
+                'Q', midpointLatLng,
+                latlng2
+            ], pathOptions).addTo(map);
+
+    }
+    
+}
+// var path=L.curve(['M',[50.54136296522163,28.520507812500004],
+// 					'C',[52.214338608258224,28.564453125000004],
+// 						[48.45835188280866,33.57421875000001],
+// 						[50.680797145321655,33.83789062500001],
+// 					'V',[48.40003249610685],
+// 					'L',[47.45839225859763,31.201171875],
+// 						[48.40003249610685,28.564453125000004],'Z'],
+// 					{color:'red',fill:true}).addTo(map);
+
+    
 function createlist(btn){
     let htmlElements = "";
     if(btn=="btn-all"){
@@ -368,7 +364,7 @@ function createlist(btn){
         list.innerHTML = htmlElements;
         for (let i = 0; i < unbalance.length; i++) {
             let li=document.getElementById("list"+i);
-            li.innerHTML=unbalance[i].stationID;
+            li.innerHTML=unbalance[i].name;
             li.style.color="aliceblue";
             if(unbalance[i].active==0){
                 li.style.background="#35342F";
@@ -447,28 +443,7 @@ function search_station(){
             
         }
     })
-    // for(let i=0;i<markerlist.length;i++){
-    //     if(Number(searchid)==markerlist[i].options.stationid){
 
-    //         msg=document.getElementById("valid-msg");
-    //         msg.style.opacity='1';
-    //         setTimeout(()=>{
-    //             msg.style.opacity = '0'
-    //         },2000)
-    //         stationname.innerHTML = finalresults[markerlist[i].options.customID].name;
-    //         total.innerHTML = "total: "+finalresults[markerlist[i].options.customID].total;                               
-    //         bike.innerHTML = "bike: "+finalresults[markerlist[i].options.customID].bike;             
-    //         free.innerHTML = "free: "+finalresults[markerlist[i].options.customID].freespace;
-    //         map.setView([markerlist[i]._latlng.lat,markerlist[i]._latlng.lng],16);
-    //         markerlist[i].openPopup();
-    //         last=markerlist[i].options.customID;
-    //         stationblock.style.display="block";
-    //         nomatch=false;
-            
-            
-    //     }
-        
-    // }
     if(nomatch){
         msg=document.getElementById("invalid-msg");
         msg.style.opacity='1';
@@ -478,10 +453,9 @@ function search_station(){
     }
 }
 
-const date = new Date('April 1, 2023, 00:00:00');
+
 // real-time clock function
 function display_ct7() {
-    //let x = new Date('April 1, 2023, 00:00:00')
 
     let hours = date.getHours().toString();
     hours=hours.length==1? 0+hours : hours;
@@ -505,6 +479,9 @@ function display_ct7() {
 }
 function display_c7(){
         let refresh=1000; // Refresh rate in milli seconds
+        if(datesAreOnSameDay(date,nextdate)){
+            update_data();
+        }
         date.setSeconds(date.getSeconds() + 1);
         mytime=setTimeout('display_ct7()',refresh)
 }
@@ -615,6 +592,3 @@ new Chart(hourchart, {
     }
 });
 
-
-
-    

@@ -5,7 +5,7 @@
     <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self';
     style-src-elem 'self' https://unpkg.com;
-    script-src-elem 'self' https://unpkg.com https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js 
+    script-src-elem 'self' https://elfalem.github.io/Leaflet.curve/src/leaflet.curve.js https://unpkg.com https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js 
     https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js https://cdn.jsdelivr.net/npm/chart.js;
     img-src 'self' https://unpkg.com https://tile.openstreetmap.org https://tiles.stadiamaps.com data:;
     connect-src 'self' data:;
@@ -13,9 +13,13 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
     integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI="
     crossorigin=""/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
+    <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
     integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM="
     crossorigin=""></script>
+    <script src="https://elfalem.github.io/Leaflet.curve/src/leaflet.curve.js"></script>
     <link rel="stylesheet" href="index.css">
     
     <title>Youbike2.0 KTown</title>
@@ -44,6 +48,7 @@
         <div id="total"></div>
         <div id="bike"></div>
         <div id="free"></div>
+        <div id="triprecord"></div>
       </div>
       
     </div>
@@ -92,10 +97,13 @@
         
       </div>  
     </div>
+    
+    
+    <script src="leaflet.curve.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
-    <script src="renderer.js"></script>
     <script src="leaflet-providers.js"></script>
+    <script defer src="renderer.js"></script>
   </body>
 </html>

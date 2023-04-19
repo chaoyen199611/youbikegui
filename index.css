@@ -185,6 +185,11 @@ li button:hover:not(.active) {
     width: 28%;
     background-color: black;
 }
+#triprecord{
+    height:50%;
+    width:100%;
+    background-color: blue;
+}
 
 .icon-list {
     font-size: 1rem;

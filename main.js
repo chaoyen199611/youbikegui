@@ -1,7 +1,6 @@
 // main.js
-
 // Modules to control application life and create native browser window
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow} = require('electron')
 const { mkdirSync } = require('fs')
 const path = require('path')
 
@@ -24,6 +23,13 @@ const createWindow = () => {
   mainWindow.webContents.openDevTools()
 }
 
+function sendWindowMessage(targetWindow, message, payload) {
+  if(typeof targetWindow === 'undefined') {
+    console.log('Target window does not exist');
+    return;
+  }
+  targetWindow.webContents.send(message, payload);
+}
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -34,6 +40,7 @@ app.whenReady().then(() => {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
+    
   })
 })
 
