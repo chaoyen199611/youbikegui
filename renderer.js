@@ -238,9 +238,8 @@ else{
 }
 });
 
-
+//update the station data for every one minute.
 function update_data() {
-    //request new table every 30sec
     rebalancepoint=[L.latLng(22.6317876, 120.3038053)]
     let currtime = nextdate
     currtime.setHours(currtime.getHours()+8);
@@ -412,7 +411,9 @@ function createtriplist(results,current){
     }
     
 }
-    
+
+
+//create unbalance station list    
 function createlist(btn){
     let htmlElements = "";
     if(btn=="btn-all"){
@@ -476,7 +477,7 @@ function createlist(btn){
 }
 
 
-
+//the search box function
 function search_station(){
     let searchid = document.getElementById("site-search").value
     let nomatch=true;
